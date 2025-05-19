@@ -8,6 +8,7 @@ import {
   CheckCircleOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  FileOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
@@ -28,6 +29,7 @@ const MainLayout: React.FC = () => {
     if (path.includes('/employee')) return ['employee'];
     if (path === '/clients') return ['clients'];
     if (path === '/finished-clients') return ['finished'];
+    if (path === '/demandas') return ['demandas'];
     return ['dashboard'];
   };
 
@@ -62,6 +64,11 @@ const MainLayout: React.FC = () => {
               key: 'clients',
               icon: <TeamOutlined />,
               label: <Link to="/clients">Clientes</Link>,
+            },
+            {
+              key: 'demandas',
+              icon: <FileOutlined />,
+              label: <Link to="/demandas">Demandas</Link>,
             },
             {
               key: 'finished',

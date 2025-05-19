@@ -80,7 +80,7 @@ const ImplantacaoTab: React.FC = () => {
     }
   };
 
-  const columns: ColumnsType<DemandItem> = [
+  const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -99,19 +99,19 @@ const ImplantacaoTab: React.FC = () => {
         { text: 'Roberto Alves', value: 'Roberto Alves' },
         { text: 'Fernanda Lima', value: 'Fernanda Lima' },
       ],
-      onFilter: (value, record) => record.responsible.indexOf(value as string) === 0,
+      onFilter: (value: any, record: DemandItem) => record.responsible.indexOf(value as string) === 0,
     },
     {
       title: 'Data de Vencimento',
       dataIndex: 'deadline',
       key: 'deadline',
-      sorter: (a, b) => a.deadline.localeCompare(b.deadline),
+      sorter: (a: DemandItem, b: DemandItem) => a.deadline.localeCompare(b.deadline),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (_, record) => (
+      render: (_: any, record: DemandItem) => (
         <Select 
           defaultValue={record.status} 
           style={{ width: 140 }}
@@ -129,7 +129,7 @@ const ImplantacaoTab: React.FC = () => {
         </Select>
       ),
     },
-  ];
+  ] as ColumnsType<DemandItem>;
 
   return (
     <div className="implantacao-tab">

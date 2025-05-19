@@ -3,7 +3,7 @@
 declare module 'antd';
 declare module 'antd/lib/locale/pt_BR';
 declare module 'antd/es/table' {
-  export interface ColumnsType<T> {
+  export interface ColumnsType<T> extends Array<{
     title: string;
     dataIndex?: string;
     key?: string;
@@ -11,7 +11,7 @@ declare module 'antd/es/table' {
     filters?: { text: string; value: string }[];
     onFilter?: (value: any, record: T) => boolean;
     sorter?: (a: T, b: T) => number;
-  }
+  }> {}
 }
 declare module 'antd/es/checkbox' {
   export interface CheckboxProps {
