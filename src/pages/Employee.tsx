@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Row, Col, Card, Form, Input, Button, List, Checkbox } from 'antd';
 import { Column } from '@ant-design/charts';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { Row, Col, Card, Form, Input, Button, List, Checkbox } from 'antd';
+import type { CheckboxProps } from 'antd/es/checkbox';
 
 interface Task {
   id: string;
@@ -38,9 +38,10 @@ const Employee: React.FC = () => {
     form.resetFields();
   };
 
-  const handleTaskToggle = (id: string, e: CheckboxChangeEvent) => {
+  const handleTaskToggle = (id: string, e: CheckboxProps) => {
+    const checked = e.target?.checked;
     const updatedTasks = tasks.map(task => 
-      task.id === id ? { ...task, completed: e.target.checked } : task
+      task.id === id ? { ...task, completed: Boolean(checked) } : task
     );
     setTasks(updatedTasks);
   };
@@ -55,8 +56,7 @@ const Employee: React.FC = () => {
     yField: 'cardapios',
     color: '#5447C2',
     label: {
-      // Atualizando para usar configuração compatível com o tipo ColumnConfig
-      position: 'top',
+      formatter: (text: any) => text.cardapios,
       style: {
         fill: '#FFFFFF',
         opacity: 0.6,

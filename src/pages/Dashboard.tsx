@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Column } from '@ant-design/charts';
 import { Row, Col, Card } from 'antd';
@@ -26,7 +25,7 @@ const Dashboard: React.FC = () => {
     { category: 'Cliente Sugeriu', value: 5 },
   ];
 
-  // Configuração comum para gráficos - com configurações de label compatíveis
+  // Configuração comum para gráficos - usando tipos corretos para @ant-design/charts
   const getChartConfig = (data: any[], color: string = '#5447C2') => {
     return {
       data,
@@ -34,8 +33,7 @@ const Dashboard: React.FC = () => {
       yField: 'value',
       color,
       label: {
-        // Configuração compatível com o tipo ColumnConfig
-        position: 'top',
+        formatter: (text: any) => text.value,
         style: {
           fill: '#FFFFFF',
           opacity: 0.8,

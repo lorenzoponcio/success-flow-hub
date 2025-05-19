@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Select, DatePicker, Space, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import type { TableProps } from 'antd/es/table';
+import type { ColumnsType } from 'antd/es/table';
 
 const { Option } = Select;
 
@@ -90,7 +89,7 @@ const ColetaTab: React.FC = () => {
     }
   };
 
-  const columns: TableProps<DemandItem>['columns'] = [
+  const columns: ColumnsType<DemandItem> = [
     {
       title: 'ID',
       dataIndex: 'id',
