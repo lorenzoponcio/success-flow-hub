@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
     { category: 'Cliente Sugeriu', value: 5 },
   ];
 
-  // Configuração comum para gráficos
+  // Configuração comum para gráficos - corrigindo o formato do label para atender ao tipo ColumnConfig
   const getChartConfig = (data: any[], color: string = '#5447C2') => {
     return {
       data,
@@ -34,6 +34,7 @@ const Dashboard: React.FC = () => {
       yField: 'value',
       color,
       label: {
+        // Alterando de 'position: middle' para type-safe values compatíveis com @ant-design/charts
         position: 'middle',
         style: {
           fill: '#FFFFFF',

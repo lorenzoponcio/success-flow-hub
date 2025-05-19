@@ -55,6 +55,7 @@ const Employee: React.FC = () => {
     yField: 'cardapios',
     color: '#5447C2',
     label: {
+      // Corrigindo a configuração do label para ser compatível com @ant-design/charts
       position: 'middle',
       style: {
         fill: '#FFFFFF',

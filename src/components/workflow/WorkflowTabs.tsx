@@ -1,31 +1,34 @@
 
 import React, { useState } from 'react';
-import { Tabs } from 'antd';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ColetaTab from './ColetaTab';
 import CriacaoTab from './CriacaoTab';
 import ImplantacaoTab from './ImplantacaoTab';
 
-const { TabPane } = Tabs;
-
 const WorkflowTabs: React.FC = () => {
   const [activeTab, setActiveTab] = useState('coleta');
 
-  const handleTabChange = (key: string) => {
-    setActiveTab(key);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
 
   return (
     <div className="workflow-tabs">
-      <Tabs activeKey={activeTab} onChange={handleTabChange} type="card">
-        <TabPane tab="Coleta" key="coleta">
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="coleta">Coleta</TabsTrigger>
+          <TabsTrigger value="criacao">Criação</TabsTrigger>
+          <TabsTrigger value="implantacao">Implantação</TabsTrigger>
+        </TabsList>
+        <TabsContent value="coleta">
           <ColetaTab />
-        </TabPane>
-        <TabPane tab="Criação" key="criacao">
+        </TabsContent>
+        <TabsContent value="criacao">
           <CriacaoTab />
-        </TabPane>
-        <TabPane tab="Implantação" key="implantacao">
+        </TabsContent>
+        <TabsContent value="implantacao">
           <ImplantacaoTab />
-        </TabPane>
+        </TabsContent>
       </Tabs>
     </div>
   );
