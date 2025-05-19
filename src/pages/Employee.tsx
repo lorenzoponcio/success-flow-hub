@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import { Column } from '@ant-design/charts';
 import { Row, Col, Card, Form, Input, Button, List, Checkbox } from 'antd';
-import type { CheckboxProps } from 'antd/es/checkbox';
 
 interface Task {
   id: string;
@@ -38,7 +36,7 @@ const Employee: React.FC = () => {
     form.resetFields();
   };
 
-  const handleTaskToggle = (id: string, e: CheckboxProps) => {
+  const handleTaskToggle = (id: string, e: any) => {
     const checked = e.target?.checked;
     const updatedTasks = tasks.map(task => 
       task.id === id ? { ...task, completed: Boolean(checked) } : task
