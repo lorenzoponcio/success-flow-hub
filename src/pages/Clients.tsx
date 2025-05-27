@@ -1,71 +1,31 @@
 
 import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Space, Tag } from 'antd';
+import { Table, Button, Modal, Form, Input, Select, Space, Tag, message } from 'antd';
 import { PlusOutlined, SearchOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import WorkflowTabs from '../components/workflow/WorkflowTabs';
+import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from '../hooks/useClients';
+import { Client } from '../services/apiService';
 
 const { Option } = Select;
 
-interface Client {
-  key: string;
-  id: string;
-  name: string;
-  contact: string;
-  email: string;
-  status: string;
-}
-
-const initialClients: Client[] = [
-  {
-    key: '1',
-    id: 'CLI001',
-    name: 'Restaurante A',
-    contact: '(11) 98765-4321',
-    email: 'contato@restaurantea.com',
-    status: 'coleta',
-  },
-  {
-    key: '2',
-    id: 'CLI002',
-    name: 'Pizzaria B',
-    contact: '(11) 91234-5678',
-    email: 'contato@pizzariab.com',
-    status: 'criação',
-  },
-  {
-    key: '3',
-    id: 'CLI003',
-    name: 'Lanchonete C',
-    contact: '(11) 99876-5432',
-    email: 'contato@lanchonetec.com',
-    status: 'implantação',
-  },
-  {
-    key: '4',
-    id: 'CLI004',
-    name: 'Cafeteria D',
-    contact: '(11) 92345-6789',
-    email: 'contato@cafeteriad.com',
-    status: 'coleta',
-  },
-];
-
 const Clients: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'workflow'>('list');
-  const [clients, setClients] = useState<Client[]>(initialClients);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [editingClientKey, setEditingClientKey] = useState<string | null>(null);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
 
-  const showModal = (clientKey?: string) => {
+  // React Query hooks
+  const { data: clients = [], isLoading, error } = useClients();
+  const createClientMutation = useCreateClient();
+  const updateClientMutation = useUpdateClient();
+  const deleteClientMutation = useDeleteClient();
+
+  const showModal = (client?: Client) => {
     setIsModalVisible(true);
-    setEditingClientKey(clientKey || null);
+    setEditingClient(client || null);
     
-    if (clientKey) {
-      const client = clients.find(c => c.key === clientKey);
-      if (client) {
-        form.setFieldsValue(client);
-      }
+    if (client) {
+      form.setFieldsValue(client);
     } else {
       form.resetFields();
     }
@@ -74,34 +34,57 @@ const Clients: React.FC = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
-    setEditingClientKey(null);
+    setEditingClient(null);
   };
 
-  const handleSave = () => {
-    form.validateFields().then((values) => {
-      if (editingClientKey) {
-        // Edit existing client
-        setClients(clients.map(client => 
-          client.key === editingClientKey ? { ...values, key: editingClientKey } : client
-        ));
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      
+      if (editingClient?.id) {
+        // Atualizar cliente existente
+        await updateClientMutation.mutateAsync({ 
+          id: editingClient.id, 
+          client: values 
+        });
+        message.success('Cliente atualizado com sucesso!');
       } else {
-        // Add new client
-        const newClient: Client = {
-          key: `cli-${Date.now()}`,
-          ...values,
-        };
-        setClients([...clients, newClient]);
+        // Criar novo cliente
+        await createClientMutation.mutateAsync(values);
+        message.success('Cliente criado com sucesso!');
       }
       
       setIsModalVisible(false);
       form.resetFields();
-      setEditingClientKey(null);
-    });
+      setEditingClient(null);
+    } catch (error) {
+      console.error('Erro ao salvar cliente:', error);
+      message.error('Erro ao salvar cliente. Verifique se o backend está rodando.');
+    }
   };
 
-  const handleDelete = (key: string) => {
-    setClients(clients.filter(client => client.key !== key));
+  const handleDelete = async (client: Client) => {
+    if (!client.id) return;
+    
+    try {
+      await deleteClientMutation.mutateAsync(client.id);
+      message.success('Cliente deletado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao deletar cliente:', error);
+      message.error('Erro ao deletar cliente. Verifique se o backend está rodando.');
+    }
   };
+
+  if (error) {
+    return (
+      <div className="clients-page">
+        <h1 className="text-2xl font-bold mb-6">Gerenciamento de Clientes</h1>
+        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          Erro ao conectar com o backend. Verifique se o servidor está rodando em http://localhost:8080
+        </div>
+      </div>
+    );
+  }
 
   const columns = [
     {
@@ -151,14 +134,15 @@ const Clients: React.FC = () => {
         <Space size="small">
           <Button 
             icon={<EditOutlined />} 
-            onClick={() => showModal(record.key)}
+            onClick={() => showModal(record)}
             type="text"
           />
           <Button 
             icon={<DeleteOutlined />} 
-            onClick={() => handleDelete(record.key)} 
+            onClick={() => handleDelete(record)} 
             type="text"
             danger
+            loading={deleteClientMutation.isPending}
           />
         </Space>
       ),
@@ -194,7 +178,12 @@ const Clients: React.FC = () => {
               enterButton={<SearchOutlined />}
               style={{ maxWidth: 300 }}
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />} 
+              onClick={() => showModal()}
+              loading={createClientMutation.isPending}
+            >
               Adicionar Cliente
             </Button>
           </div>
@@ -202,8 +191,9 @@ const Clients: React.FC = () => {
           <Table 
             columns={columns} 
             dataSource={clients} 
-            rowKey="key" 
+            rowKey="id" 
             pagination={{ pageSize: 10 }}
+            loading={isLoading}
           />
         </>
       ) : (
@@ -211,15 +201,20 @@ const Clients: React.FC = () => {
       )}
 
       <Modal
-        title={editingClientKey ? "Editar Cliente" : "Adicionar Novo Cliente"}
+        title={editingClient ? "Editar Cliente" : "Adicionar Novo Cliente"}
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={handleSave}>
-            {editingClientKey ? "Salvar" : "Adicionar"}
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={handleSave}
+            loading={createClientMutation.isPending || updateClientMutation.isPending}
+          >
+            {editingClient ? "Salvar" : "Adicionar"}
           </Button>,
         ]}
       >
@@ -228,13 +223,6 @@ const Clients: React.FC = () => {
           layout="vertical"
           name="client_form"
         >
-          <Form.Item
-            name="id"
-            label="ID"
-            rules={[{ required: true, message: 'Por favor, insira o ID!' }]}
-          >
-            <Input prefix="CLI" placeholder="Número de identificação" />
-          </Form.Item>
           <Form.Item
             name="name"
             label="Nome"
